@@ -1,0 +1,4 @@
+development:
+  :github:
+    :consumer_key: dev_key
+    :consumer_secret: dev_secret
