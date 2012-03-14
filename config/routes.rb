@@ -57,4 +57,6 @@ Updownvote::Application.routes.draw do
   root :to => 'auth#options'
   #match '/auth/:provider/callback' => 'sessions#create', :as => :omniauth_callback
   match '/auth/callback(/:provider)' => 'sessions#create'
+
+  resources :projects
 end
