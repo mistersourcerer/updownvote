@@ -55,8 +55,8 @@ Updownvote::Application.routes.draw do
   # Note: This route will make all actions in every controller accessible via GET requests.
   # match ':controller(/:action(/:id))(.:format)'
   root :to => 'auth#options'
-  #match '/auth/:provider/callback' => 'sessions#create', :as => :omniauth_callback
-  match '/auth/callback(/:provider)' => 'sessions#create'
+
+  match "/auth/:provider/callback", to: "sessions#create"
 
   resources :projects
 end
