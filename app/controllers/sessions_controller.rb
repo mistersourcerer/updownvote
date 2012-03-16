@@ -1,7 +1,9 @@
 class SessionsController < ApplicationController
+  uses_authenticator
+  uses_current_user
 
   def create
-    authenticator.authenticate
+    auth.authenticate
     if current_user
       redirect_to projects_path
     else
