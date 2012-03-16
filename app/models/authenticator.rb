@@ -14,18 +14,24 @@ class Authenticator
   def authenticate
     return false unless @info
 
-    user = @all_users.find_or_initialize_by_email(@info["info"] && @info["info"]["email"])
-    auth = @all_auths.find_or_initialize_by_uid(@info["uid"])
-    user.add_authentication auth
-    @all_users.add_or_update(user)
+    @session[:user] = user_for_info(@info)
 
-    @session[:user] = user
-
-    return true
+    true
   end
 
   def current(key)
     @session[key]
+  end
+
+  private
+  def user_for_info(info)
+    user = @all_users.find_or_initialize_by_email(@info["info"] && @info["info"]["email"])
+    auth = @all_auths.find_or_initialize_by_uid(@info["uid"])
+    user.add_authentication auth
+
+    @all_users.add_or_update(user)
+
+    user
   end
 
 end
