@@ -18,9 +18,9 @@ describe Authenticator do
     am
   }
 
-  subject{ Authenticator.new(store, auth_hash, all_auths, all_users) }
-
   let(:store) { double("SessionStore Protocol").as_null_object }
+
+  subject{ Authenticator.new(store, auth_hash, all_auths, all_users) }
 
   it "accepts a 'auth info' and a 'session store' on constructor" do
     lambda { Authenticator.new([], []) }.should_not raise_error
@@ -54,6 +54,11 @@ describe Authenticator do
 
     it "uses session store to save a user" do
       store.should_receive(:"[]=").with(:user, user)
+      authenticate
+    end
+
+    it "updates the user information" do
+      all_users.should_receive(:add_or_update).with(user)
       authenticate
     end
 
