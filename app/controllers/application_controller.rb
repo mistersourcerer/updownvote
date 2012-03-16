@@ -2,6 +2,17 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
 
   private
+  def check_authorization
+    unless current_user
+      redirect_to root_path
+    end
+  end
+
+  def self.protect_from_unauthorized
+    uses_current_user
+    before_filter :check_authorization
+  end
+
   def self.uses_authenticator(method_name = :auth)
     unless self.instance_methods.include? method_name
       define_method method_name do

@@ -31,6 +31,7 @@ describe ApplicationController do
   end# ::users_authenticator
 
   context "::uses_current_user" do
+
     before do
       class << @controller
         uses_current_user
@@ -46,6 +47,39 @@ describe ApplicationController do
       session[:user] = user
       @controller.current_user.should be(user)
     end
+
   end
+
+
+end
+
+module MySpec
+
+  class RestrictedController < ApplicationController
+    protect_from_unauthorized
+
+    def xpto
+      render :text => "x"
+    end
+  end
+
+  describe RestrictedController do
+
+    context "authorization control" do
+
+      it "#redirect_to :index if none authorized user is present" do
+        get :xpto
+        response.should redirect_to root_path
+      end
+
+      it "lives the action alone if an authorized user exists" do
+        session[:user] = "borba"
+        get :xpto
+        response.should_not redirect_to root_path
+      end
+
+    end
+
+  end# authorization control
 
 end

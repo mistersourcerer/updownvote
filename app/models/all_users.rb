@@ -6,7 +6,7 @@ class AllUsers
   end
 
   def find_or_initialize_by_email(email)
-    @finder.find_or_initialize_by_email(email)
+    @finder.find_or_create_by_email(email)
   end
 
   def add_or_update(user)

@@ -13,10 +13,11 @@ group :assets do
 end
 
 group :test, :development do
-  gem 'sqlite3'
-  gem 'rspec-rails'
+  gem 'sqlite3', '~> 1.3'
+  gem 'rspec-rails', '~> 2.8.1'
+  gem 'mysql2', '~> 0.3'
 end
 
-gem 'pg'
-gem 'jquery-rails'
-gem 'omniauth-github'
+gem 'pg', '~> 0.3'
+gem 'jquery-rails', '~> 1.0.12'
+gem 'omniauth-github', '~> 1.0'
