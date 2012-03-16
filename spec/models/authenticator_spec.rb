@@ -18,7 +18,7 @@ describe Authenticator do
     am
   }
 
-  subject{ Authenticator.new(auth_hash, store, all_auths, all_users) }
+  subject{ Authenticator.new(store, auth_hash, all_auths, all_users) }
 
   let(:store) { double("SessionStore Protocol").as_null_object }
 
