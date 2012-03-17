@@ -1,6 +1,4 @@
 class SessionsController < ApplicationController
-  uses_authenticator
-  uses_current_user
 
   def create
     auth.authenticate

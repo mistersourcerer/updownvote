@@ -2,70 +2,47 @@ require "spec_helper"
 
 describe ApplicationController do
 
-  context "::uses_authenticator" do
+  context "access control methods" do
 
-    it "adds an instance method called auth" do
-      class << @controller
-        uses_authenticator :omg_lol
-      end
-
-      @controller.should respond_to :omg_lol
-    end
-
-    it "defaults the method name to auth" do
-      class << @controller
-        uses_authenticator
-      end
-
+    it "allow access to the authenticator" do
       @controller.should respond_to :auth
     end
 
-    it "the generated methods returns an object that is_a? Authenticator" do
-      class << @controller
-        uses_authenticator
-      end
-
-      @controller.auth.should be_a Authenticator
+    it "#auth returns an object that is_a? Authenticator" do
+      @controller.send(:auth).should be_a(Authenticator)
     end
 
-  end# ::users_authenticator
-
-  context "::uses_current_user" do
-
-    before do
-      class << @controller
-        uses_current_user
-      end
-    end
-
-    it "adds an instance method #current_user" do
+    it "allow access to logged in user via #current_user" do
       @controller.should respond_to :current_user
     end
 
-    it "returns the object in session related to the :user key" do
+    it "#current_user returns the object in session related to the :user key" do
       user = double("User")
       session[:user] = user
-      @controller.current_user.should be(user)
+      @controller.send(:current_user).should be(user)
     end
 
-  end
-
+  end# access control
 
 end
 
 module MySpec
 
   class RestrictedController < ApplicationController
-    protect_from_unauthorized
+    protect_from_unauthorized :except => [:omglol]
 
     def xpto
       render :text => "x"
+    end
+
+    def omglol
+      render :text => "LoL"
     end
   end
 
   describe RestrictedController do
 
-    context "authorization control" do
+    context "access control (ordinary controllers)" do
 
       it "#redirect_to :index if none authorized user is present" do
         get :xpto
@@ -76,6 +53,11 @@ module MySpec
         session[:user] = "borba"
         get :xpto
         response.should_not redirect_to root_path
+      end
+
+      it "leave the action alone if we say so" do
+        get :omglol
+        response.should be_success
       end
 
     end
