@@ -14,7 +14,7 @@ class Authenticator
 
     user = user_for_info(@info)
     @all_users.add_or_update(user)
-    @session[:user] = user
+    @session[:user] = {id: user.id}
 
     true
   end
@@ -23,17 +23,20 @@ class Authenticator
     @session[key]
   end
 
-  def new_authentication_with_info(auth_info)
-    Authentication.new(
-      uid:  auth_info["uid"],
-      data: auth_info["info"].merge(auth_info["extra"])
-    )
+  def new_authentication_with_info(auth_info, finder)
+    auth = finder.find_or_create_by_uid auth_info["uid"]
+    data = auth_info["extra"].merge(auth_info["info"])
+    if auth.data != data
+      auth.data = data
+      auth.save
+    end
+    auth
   end
 
   private
   def user_for_info(info)
     user = @all_users.find_or_create_by_email(@info["info"] && @info["info"]["email"])
-    user.add_authentication new_authentication_with_info(@info)
+    user.add_authentication new_authentication_with_info(@info, user.authentications)
 
     nome = @info["info"] && @info["info"]["name"]
     if user.nome != nome

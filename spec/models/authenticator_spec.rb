@@ -27,14 +27,19 @@ describe Authenticator do
   end
 
   describe "produces authentication object" do
+    let(:finder) {
+      f = double("auth finder").as_null_object
+      f.stub(:find_or_create_by_uid).and_return(Authentication.new(uid:auth_hash["uid"]))
+      f
+    }
 
     it "creates authentication with correct uid" do
-      new_auth = subject.new_authentication_with_info(auth_hash)
-      new_auth.uid.should == auth_hash["uid"]
+      finder.should_receive(:find_or_create_by_uid).with(auth_hash["uid"])
+      subject.new_authentication_with_info(auth_hash, finder)
     end
 
     it "stores raw_info on authentication" do
-      new_auth = subject.new_authentication_with_info(auth_hash)
+      new_auth = subject.new_authentication_with_info(auth_hash, finder)
       new_auth.data.should == auth_hash["info"].merge(auth_hash["extra"])
     end
 
@@ -51,18 +56,13 @@ describe Authenticator do
       authenticate
     end
 
-    it "creates new authentication object" do
-      subject.should_receive(:new_authentication_with_info).with(auth_hash)
-      authenticate
-    end
-
     it "updates user authentications" do
       user.should_receive(:add_authentication)
       authenticate
     end
 
     it "uses session store to save a user" do
-      store.should_receive(:"[]=").with(:user, user)
+      store.should_receive(:"[]=").with(:user, {id: user.id})
       authenticate
     end
 
