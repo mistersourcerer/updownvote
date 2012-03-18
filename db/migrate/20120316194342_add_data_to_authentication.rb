@@ -1,6 +1,6 @@
 class AddDataToAuthentication < ActiveRecord::Migration
   def up
-    add_column :authentications, :data, :string
+    add_column :authentications, :data, :text
   end
 
   def down

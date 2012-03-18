@@ -5,17 +5,12 @@ class AllUsers
     @store = user_store
   end
 
-  def find_or_initialize_by_email(email)
+  def find_or_create_by_email(email)
     @finder.find_or_create_by_email(email)
   end
 
   def add_or_update(user)
-    store_for(user).save
-  end
-
-  private
-  def store_for(storable)
-    @store || storable
+    user.save
   end
 
 end

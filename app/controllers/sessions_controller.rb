@@ -1,6 +1,7 @@
 class SessionsController < ApplicationController
 
   def create
+    session.clear
     auth.authenticate
 
     if current_user

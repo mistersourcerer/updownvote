@@ -7,20 +7,15 @@ describe Authenticator do
   let(:user) { double("User").as_null_object }
   let(:all_users) {
     um = double("User fetcher").as_null_object
-    um.stub(:find_or_initialize_by_email).and_return(user)
+    um.stub(:find_or_create_by_email).and_return(user)
     um
-  }
-
-  let(:authentication) { double("Authentication").as_null_object }
-  let(:all_auths) {
-    am = double("Authentication fetcher").as_null_object
-    am.stub(:find_or_initialize_by_uid).and_return(authentication)
-    am
   }
 
   let(:store) { double("SessionStore Protocol").as_null_object }
 
-  subject{ Authenticator.new(store, auth_hash, all_auths, all_users) }
+  subject{
+    Authenticator.new(store, auth_hash, all_users)
+  }
 
   it "accepts a 'auth info' and a 'session store' on constructor" do
     lambda { Authenticator.new([], []) }.should_not raise_error
@@ -31,24 +26,38 @@ describe Authenticator do
     subject.current :xpto
   end
 
+  describe "produces authentication object" do
+
+    it "creates authentication with correct uid" do
+      new_auth = subject.new_authentication_with_info(auth_hash)
+      new_auth.uid.should == auth_hash["uid"]
+    end
+
+    it "stores raw_info on authentication" do
+      new_auth = subject.new_authentication_with_info(auth_hash)
+      new_auth.data.should == auth_hash["info"].merge(auth_hash["extra"])
+    end
+
+  end
+
   context "#authenticate with valid auth info" do
 
     def authenticate
       subject.authenticate
     end
 
-    it "find authentication based on uid" do
-      all_auths.should_receive(:find_or_initialize_by_uid).with(auth_hash["uid"])
-      authenticate
-    end
-
     it "find user based on email" do
-      all_users.should_receive(:find_or_initialize_by_email).with(auth_hash["info"]["email"])
+      all_users.should_receive(:find_or_create_by_email).with(auth_hash["info"]["email"])
       authenticate
     end
 
-    it "associates authentication with user" do
-      user.should_receive(:add_authentication).with(authentication)
+    it "creates new authentication object" do
+      subject.should_receive(:new_authentication_with_info).with(auth_hash)
+      authenticate
+    end
+
+    it "updates user authentications" do
+      user.should_receive(:add_authentication)
       authenticate
     end
 

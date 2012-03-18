@@ -6,13 +6,7 @@ describe AllUsers do
 
   subject { AllUsers.new(user_finder) }
 
-  it { should respond_to :find_or_initialize_by_email }
-
-  it "uses a store to save an user instance" do
-    all = AllUsers.new(user_finder, user_store)
-    user_store.should_receive(:save)
-    all.add_or_update(user)
-  end
+  it { should respond_to :find_or_create_by_email }
 
   it "proxies the #save call to the parameter if dosen't exists a store" do
     user.should_receive(:save)
